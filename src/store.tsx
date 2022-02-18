@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { createContext, useState, useContext, useRef } from "react"
+
 
 export interface Todo{
     id: number;
@@ -20,7 +21,39 @@ export const updateTodo = (todos: Todo[], text: string, id: number): Todo[] => (
     todos.map(item => item.id === id ? {...item, text} : item)
 )
 
-export const useTodos = (initial: Todo[]) => useState<Todo[]>(initial)
-export type UseTodosType = ReturnType<typeof useTodos>
-export type TodosType = UseTodosType[0]
-export type SetTodosType = UseTodosType[1]
+//implement todos context
+export const useTodos = (initial: Todo[]) => {
+    const [todos,setTodos] = useState<Todo[]>(initial)
+    const [newTodo, setNewTodo] = useState("");
+
+    return {
+        todos,
+        newTodo,
+        setNewTodo,
+        addTodo(){
+            setTodos(addTodo(todos, newTodo))
+            setNewTodo("")
+        },
+        removeTodo(id: number){
+            setTodos(removeTodo(todos, id))
+        },
+        toggleTodo(id: number){
+            setTodos(toggleTodo(todos, id))
+        },
+        updateTodo(text: string, id: number){
+            setTodos(updateTodo(todos, text, id))
+        }
+    }
+}
+type UsetTodosType = ReturnType<typeof useTodos>
+
+
+const TodosContext = createContext<UsetTodosType>({} as UsetTodosType);
+export const useTodosContext = () =>  useContext(TodosContext);
+
+export const TodosProvider = ({children}: {children: React.ReactNode}) => (
+    <TodosContext.Provider value={useTodos([])}>
+        {children}
+    </TodosContext.Provider>
+)
+
