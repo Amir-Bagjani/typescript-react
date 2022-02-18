@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from "react"
 
+
 export interface Todo{
     id: number;
     text: string;
@@ -20,6 +21,7 @@ export const updateTodo = (todos: Todo[], text: string, id: number): Todo[] => (
     todos.map(item => item.id === id ? {...item, text} : item)
 )
 
+
 //implement todos context
 export const useTodos = (initial: Todo[]) => useState<Todo[]>(initial)
 type UsetTodosType = ReturnType<typeof useTodos>
@@ -33,3 +35,4 @@ export const TodosProvider = ({children}: {children: React.ReactNode}) => (
         {children}
     </TodosContext.Provider>
 )
+
