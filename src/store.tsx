@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 export interface Todo{
     id: number;
     text: string;
@@ -17,3 +19,9 @@ export const toggleTodo = (todos: Todo[], id: number): Todo[] => (
 export const updateTodo = (todos: Todo[], text: string, id: number): Todo[] => (
     todos.map(item => item.id === id ? {...item, text} : item)
 )
+
+
+export const useTodos = (initial: Todo[]) => useState<Todo[]>(initial)
+export type UseTodosType = ReturnType<typeof useTodos>
+export type TodosType = UseTodosType[0]
+export type SetTodosType = UseTodosType[1]
