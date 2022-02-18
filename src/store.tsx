@@ -20,6 +20,7 @@ export const updateTodo = (todos: Todo[], text: string, id: number): Todo[] => (
     todos.map(item => item.id === id ? {...item, text} : item)
 )
 
+
 export const useTodos = (initial: Todo[]) => useState<Todo[]>(initial)
 export type UseTodosType = ReturnType<typeof useTodos>
 export type TodosType = UseTodosType[0]
