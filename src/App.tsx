@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Checkbox, Container, Grid, TextField } from "@mui/material";
 import "./App.css";
@@ -58,5 +59,50 @@ function App() {
     </div>
   );
 }
+
+function AddItem() {
+  const [todos, setTodos] = useTodosContext();
+  const [newTodo, setnewTodo] = useState("");
+  const handleAdd = () => {
+    setTodos(addTodo(todos, newTodo));
+    setnewTodo("");
+  };
+
+  return (
+    <Grid container gap={9}>
+      <TextField
+        onChange={(e) => setnewTodo(e.target.value)}
+        value={newTodo}
+        variant="outlined"
+        size="small"
+      />
+      <Button onClick={handleAdd} variant="outlined">
+        Add Todo
+      </Button>
+    </Grid>
+  );
+}
+
+function AppWrapper() {
+  const [todos] = useTodosContext();
+  console.log(todos);
+
+  return (
+    <>
+      <Container maxWidth="sm">
+        <ListItem />
+        <AddItem />
+      </Container>
+    </>
+  );
+}
+const App = () => (
+  <div className="App">
+    <TodosProvider>
+      <AppWrapper />
+    </TodosProvider>
+  </div>
+)
+
 
 export default App;
