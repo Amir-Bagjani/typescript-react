@@ -1,27 +1,79 @@
-import { useState } from "react"
+import { createContext, useContext, useReducer } from "react"
 
 export interface Todo{
     id: number;
     text: string;
     done: boolean;
 }
+type ActionType =
+  | { type: "ADD"; payload: string }
+  | { type: "REMOVE"; payload: number }
+  | { type: "TOGGLE"; payload: number }
+  | { type: "UPDATE"; payload: Omit<Todo, "done"> };
 
 //helper finctions
-export const addTodo = (todos: Todo[], text: string): Todo[] => (
+const addTodo = (todos: Todo[], text: string): Todo[] => (
     [...todos, {id: Math.random(), text, done: false }]
 )
-export const removeTodo = (todos: Todo[], id: number): Todo[] => (
+const removeTodo = (todos: Todo[], id: number): Todo[] => (
     todos.filter(item => item.id !== id)
 )
-export const toggleTodo = (todos: Todo[], id: number): Todo[] => (
+const toggleTodo = (todos: Todo[], id: number): Todo[] => (
     todos.map(item => item.id === id ? {...item, done: !item.done} : item)
 )
-export const updateTodo = (todos: Todo[], text: string, id: number): Todo[] => (
+const updateTodo = (todos: Todo[], text: string, id: number): Todo[] => (
     todos.map(item => item.id === id ? {...item, text} : item)
 )
 
+const todoReducer = (state: Todo[], action: ActionType) => {
+    switch (action.type) {
+      case "ADD":
+        return addTodo(state, action.payload)
+  
+      case "REMOVE":
+        return removeTodo(state, action.payload)
+  
+      case "TOGGLE":
+        return toggleTodo(state, action.payload)
+  
+      case "UPDATE":
+        return updateTodo(state, action.payload.text, action.payload.id)
+  
+      default:
+        return state;
+    }
+};
+  
 
-export const useTodos = (initial: Todo[]) => useState<Todo[]>(initial)
-export type UseTodosType = ReturnType<typeof useTodos>
-export type TodosType = UseTodosType[0]
-export type SetTodosType = UseTodosType[1]
+export const useTodos = () => {
+    const [todos,dispatch] = useReducer(todoReducer, []);
+
+    return {
+        todos,
+        addTodo(text: string){
+            dispatch({type: "ADD", payload: text})
+        },
+        removeTodo(id: number){
+            dispatch({type: "REMOVE", payload: id})
+        },
+        toggleTodo(id: number){
+            dispatch({type: "TOGGLE", payload: id})
+        },
+        updateTodo(text: string, id: number){
+            dispatch({type: "UPDATE", payload: {text, id}})
+        }
+    }
+}
+
+
+type UsetTodosType = ReturnType<typeof useTodos>
+
+
+const TodosContext = createContext<UsetTodosType>({} as UsetTodosType);
+export const useTodosContext = () =>  useContext(TodosContext);
+
+export const TodosProvider = ({children}: {children: React.ReactNode}) => (
+    <TodosContext.Provider value={useTodos()}>
+        {children}
+    </TodosContext.Provider>
+)
